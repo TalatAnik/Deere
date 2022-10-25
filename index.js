@@ -54,6 +54,14 @@ async function main (url) {
   let name = breadcrumbs[breadcrumbs.length-1].split(': ')[1]
   console.log(name)
 
+  /***READING AND STORING <<IMAGE URL>> HERE***/
+  const images = await page.$$eval(
+    'li.thumb > img',
+    (els) => {
+      return els.map(el => el.src)
+    }
+  )
+  console.log(images)
 
 }
 
