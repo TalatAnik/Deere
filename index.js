@@ -1,9 +1,20 @@
-const puppeteer = require('puppeteer')
+const puppeteer = require('puppeteer-extra')
+
 const fs = require('fs')
+
+// Add stealth plugin and use defaults (all tricks to hide puppeteer usage)
+const StealthPlugin = require('puppeteer-extra-plugin-stealth')
+puppeteer.use(StealthPlugin())
+
+// Add adblocker plugin to block all ads and trackers (saves bandwidth)
+const AdblockerPlugin = require('puppeteer-extra-plugin-adblocker')
+puppeteer.use(AdblockerPlugin({ blockTrackers: true }))
+
 
 
 async function main (url) {
   const browser = await puppeteer.launch({
+    executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
     headless: false,
     args: [`--window-size=1366,768`],
     defaultViewport: {
@@ -12,7 +23,7 @@ async function main (url) {
     }    
   })
 
-  context = browser.defaultBrowserContext()
+
   const page = await browser.newPage()
 
   await page.goto(
@@ -25,14 +36,14 @@ async function main (url) {
   /***READING AND STORING <<SKU>> HERE***/
 
   const sku = await page.$eval(
-    'div.MuiGrid-root.MuiGrid-item.MuiGrid-grid-xs-12.MuiGrid-grid-lg-7.css-12ybf7 > p',
+    'div.css-12ybf7 > p',
     el => el.innerText.split(': ')[1]
   )
   console.log(sku)
   
   
   
-  /***READING AND STORING <<SKU>> AND <<NAME>> HERE***/
+  /***READING AND STORING <<Breadcrumbs>> HERE***/
   
   let crumbsText = ''  
   const breadcrumbs = await page.$$eval(
@@ -44,10 +55,12 @@ async function main (url) {
 
   for(var i=0;i<breadcrumbs.length-1; i++)
   {
-    if(i==breadcrumbs.length-1)
+    if(i==breadcrumbs.length-2)
+    {  
       crumbsText += breadcrumbs[i]
-
-    crumbsText += breadcrumbs[i] + ">"
+    }
+    else
+      crumbsText += breadcrumbs[i] + " >"
   }
   console.log(crumbsText)
 
@@ -61,8 +74,29 @@ async function main (url) {
       return els.map(el => el.src)
     }
   )
-  console.log(images)
+  
+  /***READING AND STORING <<Product Dimensions>> HERE***/
+  //.MuiGrid-spacing-xs-10.css-1j4kxi8 > div > div
 
+  const dimensions = await page.$$eval(
+    '.MuiGrid-spacing-xs-10.css-1j4kxi8 > div > div',
+    (array) => {
+      return array.map(el => el.innerText)
+    }
+  )
+  
+  let length = 'null'
+  let width = 'null'
+  let height = 'null'
+  let weight='null'
+  for(let i=0;i<dimensions.length;i++) 
+  {
+    let str = dimensions[i]
+    if(str.substring(0,6) == "Weight")
+      weight = str.split("\n")[1]
+    console.log(weight)
+    break
+  }
 }
 
 //wait if needed
@@ -73,4 +107,4 @@ async function wait(time) {
 }
 
 
-main('https://shop.deere.com/jdb2cstorefront/JohnDeereStore/en/product/TY25221A-PL%3A-STRONGBOX%E2%84%A2-ORIGINAL-EQUIPMENT%2C-12-Volt%2C-WET-BATTERY/p/TY25221A-PL')
+main('https://shop.deere.com/jdb2cstorefront/JohnDeereStore/en/product/GY20629%3A-Idler-For-100%2C-D100%2C-G100%2C-L100%2C-La100-And-Z200-Series/p/GY20629')
