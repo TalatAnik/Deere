@@ -14,7 +14,7 @@ puppeteer.use(AdblockerPlugin({ blockTrackers: true }))
 
 async function main (url) {
   const browser = await puppeteer.launch({
-    executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
+    executablePath: 'C:/Users/Anik/.cache/puppeteer/chrome/win64-1045629/chrome-win/chrome.exe',
     headless: false,
     args: [`--window-size=1366,768`],
     defaultViewport: {
@@ -23,7 +23,7 @@ async function main (url) {
     }    
   })
 
-
+  context = browser.defaultBrowserContext()
   const page = await browser.newPage()
 
   await page.goto(
