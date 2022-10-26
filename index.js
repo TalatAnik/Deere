@@ -68,12 +68,30 @@ async function main (url) {
   
 
   /***READING AND STORING <<IMAGE URL>> HERE***/
+  
+  let image_urls = ""
+
   const images = await page.$$eval(
     'li.thumb > img',
     (els) => {
       return els.map(el => el.src)
     }
   )
+
+
+
+  for(let i = 0; i< images.length; i++)
+  {
+    if(i == images.length)
+      image_urls += images[i]
+    else
+      image_urls += images[i] + ","
+  }
+
+  //https://shop.deere.com/medias/GY20629_Media_JD1200Wx1200H?context=bWFzdGVyfHJvb3R8MTE2MTQyfGltYWdlL2pwZWd8aGNiL2g2ZC84ODQ5NTA4NjMwNTU4LmpwZ3xjNmUxYmE1OWIwMTg1OWVkODM2OTQ5OGE0ODVjZTRmYzc0ZmJiYmIyMjFkODcxNjg2NTEwOWQyNzNiZTg2OTRk
+  //https://shop.deere.com/medias/GY20629_Media_JD1200Wx1200H?context=bWFzdGVyfHJvb3R8MTE2MTQyfGltYWdlL2pwZWd8aGNiL2g2ZC84ODQ5NTA4NjMwNTU4LmpwZ3xjNmUxYmE1OWIwMTg1OWVkODM2OTQ5O
+
+
   
   /***READING AND STORING <<Product Dimensions>> HERE***/
   //.MuiGrid-spacing-xs-10.css-1j4kxi8 > div > div
@@ -147,7 +165,7 @@ async function main (url) {
     sku: sku,
     name: name,
     breadcrumbs: crumbsText,
-    image_urls: images,
+    image_urls: image_urls,
     length: length,
     width: width,
     height: height,
