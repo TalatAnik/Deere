@@ -15,7 +15,7 @@ puppeteer.use(AdblockerPlugin({ blockTrackers: true }))
 async function main (url) {
   const browser = await puppeteer.launch({
     executablePath: 'C:/Users/Anik/.cache/puppeteer/chrome/win64-1045629/chrome-win/chrome.exe',
-    headless: false,
+    headless: true,
     args: [`--window-size=1366,768`],
     defaultViewport: {
       width:1366,
@@ -39,7 +39,7 @@ async function main (url) {
     'div.css-12ybf7 > p',
     el => el.innerText.split(': ')[1]
   )
-  console.log(sku)
+  
   
   
   
@@ -62,10 +62,10 @@ async function main (url) {
     else
       crumbsText += breadcrumbs[i] + " >"
   }
-  console.log(crumbsText)
+  
 
   let name = breadcrumbs[breadcrumbs.length-1].split(': ')[1]
-  console.log(name)
+  
 
   /***READING AND STORING <<IMAGE URL>> HERE***/
   const images = await page.$$eval(
@@ -89,14 +89,73 @@ async function main (url) {
   let width = 'null'
   let height = 'null'
   let weight='null'
+
   for(let i=0;i<dimensions.length;i++) 
   {
     let str = dimensions[i]
+    if(str.substring(0,6) == "Length")
+      length = str.split("\n")[1]
+
+    if(str.substring(0,5) == "Width")
+      width = str.split("\n")[1]
+
+    if(str.substring(0,6) == "Height")
+      height = str.split("\n")[1]
+    
     if(str.substring(0,6) == "Weight")
       weight = str.split("\n")[1]
-    console.log(weight)
-    break
   }
+
+  
+
+  /***READING AND STORING <<Also Fits On>> HERE***/
+  //button.MuiTab-root
+
+
+  
+  let fitsOn = 'null'
+
+  const tabs = await page.$x(
+    "//button[contains(text(),'Also Fits on')]"
+  )
+
+  if(tabs.length>0)
+  {
+    fitsOn = ''
+
+    tabs[0].click()
+    const fitsOnArray = await page.$$eval(
+      '#tabs-7--tabpanel-1 > ul > li',
+      (array) => {
+        return array.map(el => el.innerText)
+      }
+    )
+    
+    for(i=0;i<fitsOnArray.length;i++)
+    {
+      if(i == fitsOnArray.length-1)
+        fitsOn += fitsOnArray[i]
+      else
+        fitsOn += fitsOnArray[i] + '<br>'
+    }
+        
+    
+  }  
+  
+  const prod = {
+    url: url,
+    sku: sku,
+    name: name,
+    breadcrumbs: crumbsText,
+    image_urls: images,
+    length: length,
+    width: width,
+    height: height,
+    weight: weight,
+    also_fits_on: fitsOn
+  }
+
+  console.log(JSON.stringify(prod, null,2))
 }
 
 //wait if needed
