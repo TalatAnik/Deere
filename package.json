@@ -1,4 +1,8 @@
 {
+  "scripts": {
+    "findLinks":"node linksFinder"
+  },
+
   "dependencies": {
     "puppeteer": "^19.1.0",
     "puppeteer-extra": "^3.3.4",
