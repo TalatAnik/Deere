@@ -1,9 +1,11 @@
 {
   "scripts": {
-    "findLinks":"node linksFinder"
+    "findLinks": "node linksFinder",
+    "getProxy": "node getProxy",
+    "getProdLinks": "node getProdLinks"
   },
-
   "dependencies": {
+    "jsonfile": "^6.1.0",
     "puppeteer": "^19.1.0",
     "puppeteer-extra": "^3.3.4",
     "puppeteer-extra-plugin-adblocker": "^2.13.5",

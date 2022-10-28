@@ -10,13 +10,13 @@ puppeteer.use(StealthPlugin())
 const AdblockerPlugin = require('puppeteer-extra-plugin-adblocker')
 puppeteer.use(AdblockerPlugin({ blockTrackers: true }))
 
-const fileOut = 'generated_links/links.json'
+const fileOut = 'generated_links/featuredLinks.json'
 
 
 async function main (url) {
   const browser = await puppeteer.launch({
     executablePath: 'C:/Users/Anik/.cache/puppeteer/chrome/win64-1045629/chrome-win/chrome.exe',
-    headless: false,
+    headless: true,
     args: [`--window-size=1366,768`],
     defaultViewport: {
       width:700,
@@ -51,7 +51,7 @@ async function main (url) {
   )
 
   const parts = maintenance.concat(repair)
-  let allLinks =[]
+  
 
   for(let i=0;i<parts.length;i++)
   {
@@ -69,67 +69,79 @@ async function main (url) {
       }
     )
 
-    for(let j=0; j<featuredCats.length-1; j++)
+    for (let n=0; n< featuredCats.length; n++)
     {
-      await page.goto(
-        featuredCats[j],
-        {waitUntil: "networkidle2"}
-      )
+      let data = { url: featuredCats[n]}
+      prodStr = JSON.stringify(data,null,2)
+      fs.appendFileSync(fileOut, prodStr)
+      fs.appendFileSync(fileOut, ',\n  ')
+    }
 
-      const prodCountText = await page.$eval(
-        '#root > main > section > section > div.MuiBox-root.css-19nojhs > div.MuiBox-root.css-7eskqt > h1',
-        el => el.innerText
-      )
-      let prodCount = prodCountText.split(" ")[0]
-      prodCount = parseInt(prodCount)
+          
+  
+    
 
-      console.log(prodCount)
+    // for(let j=0; j<featuredCats.length-1; j++)
+    // {
+    //   await page.goto(
+    //     featuredCats[j],
+    //     {waitUntil: "networkidle2"}
+    //   )
 
-      let clicks = Math.floor(prodCount/24)
+    //   const prodCountText = await page.$eval(
+    //     '#root > main > section > section > div.MuiBox-root.css-19nojhs > div.MuiBox-root.css-7eskqt > h1',
+    //     el => el.innerText
+    //   )
+    //   let prodCount = prodCountText.split(" ")[0]
+    //   prodCount = parseInt(prodCount)
 
-      for(let l=1; l<clicks-1; l++)
-      {
-        await wait(1000)
-        const prodLinks = await page.$$eval(
-          '.ProductCard__StyledProductDetails-bwrMVw > div > div  a',
-          arrs => {
-            return arrs.map(op => op.href)
-          }
-        )
+    //   console.log(prodCount)
+
+    //   let clicks = Math.floor(prodCount/24)
+
+    //   for(let l=1; l<clicks-1; l++)
+    //   {
+    //     await wait(1000)
+    //     const prodLinks = await page.$$eval(
+    //       '.ProductCard__StyledProductDetails-bwrMVw > div > div  a',
+    //       arrs => {
+    //         return arrs.map(op => op.href)
+    //       }
+    //     )
   
         
-        for (let k=0; k<prodLinks.length; k++)
-        {
-          prod = {
-            url: prodLinks[k]
-          }
+    //     for (let k=0; k<prodLinks.length; k++)
+    //     {
+    //       prod = {
+    //         url: prodLinks[k]
+    //       }
   
           
-          prodStr = JSON.stringify(prod,null,2)
-          fs.appendFileSync(fileOut, prodStr)
-          fs.appendFileSync(fileOut, ',\n  ')
+    //       prodStr = JSON.stringify(prod,null,2)
+    //       fs.appendFileSync(fileOut, prodStr)
+    //       fs.appendFileSync(fileOut, ',\n  ')
   
-        }
+    //     }
         
-        allLinks = allLinks.concat(prodLinks)
+    //     allLinks = allLinks.concat(prodLinks)
 
-        if (clicks>0)
-        {
-          const nextButton = await page.$('#root > main > section > section > nav > ul > li:nth-child(7) > button > svg')
+    //     if (clicks>0)
+    //     {
+    //       const nextButton = await page.$('#root > main > section > section > nav > ul > li:nth-child(7) > button > svg')
 
-          nextButton.click()
-          await page.waitForNetworkIdle(
-            {
-              idleTime: 100 
-            }
-          )
-        }
+    //       nextButton.click()
+    //       await page.waitForNetworkIdle(
+    //         {
+    //           idleTime: 100 
+    //         }
+    //       )
+    //     }
         
-      }
+    //   }
 
       
 
-    }
+    // }
 
   }
 
