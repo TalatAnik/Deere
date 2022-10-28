@@ -32,74 +32,102 @@ async function main (url) {
     { waitUntil: "networkidle2" }
   )
 
-  // const partsButton = await page.$(
-  //   'body > main > header > nav.navigation.navigation--bottom.js_navigation--bottom.js-enquire-offcanvas-navigation > div > ul.nav__links.nav__links--products.js-offcanvas-links.hidden-xs.hidden-sm > li:nth-child(2) > span.yCmsComponent.nav__link.js_nav__link > a'  
-  // )
-
-  // partsButton.hover()
+  
 
   await wait(1000)
 
-  const cat1 = await page.$$eval(
+  const maintenance = await page.$$eval(
     '#collapseMaintenanceWearNavNodeMenu > div > h4 > li > a',
     (array) => {
       return array.map(el => el.href)
     }    
   )
 
-  const cat2 = await page.$$eval(
+  const repair = await page.$$eval(
     '#collapseRepairNavNodeMenu > div > h4 > li > a',
     (array) => {
       return array.map(el => el.href)
     }    
   )
 
-  const cats = cat1.concat(cat2)
+  const parts = maintenance.concat(repair)
   let allLinks =[]
 
-  for(let i=0;i<cats.length;i++)
+  for(let i=0;i<parts.length;i++)
   {
+    await wait(1000)
+
     await page.goto(
-      cats[i],
+      parts[i],
       { waitUntil: "networkidle2" }
     )
 
-    const subcats = await page.$$eval(
+    const featuredCats = await page.$$eval(
       'body > main > div.yCmsContentSlot.row.category-container > div:nth-child(1) > div > div > div > h2 > a',
       arr => {
         return arr.map(el => el.href)
       }
     )
 
-    for(let j=0; j<subcats.length; j++)
+    for(let j=0; j<featuredCats.length-1; j++)
     {
       await page.goto(
-        subcats[j],
+        featuredCats[j],
         {waitUntil: "networkidle2"}
       )
 
-      const prodLinks = await page.$$eval(
-        '.ProductCard__StyledProductDetails-bwrMVw > div > div  a',
-        arrs => {
-          return arrs.map(op => op.href)
-        }
+      const prodCountText = await page.$eval(
+        '#root > main > section > section > div.MuiBox-root.css-19nojhs > div.MuiBox-root.css-7eskqt > h1',
+        el => el.innerText
       )
+      let prodCount = prodCountText.split(" ")[0]
+      prodCount = parseInt(prodCount)
 
-      
-      for (let k=0; k<prodLinks.length; k++)
+      console.log(prodCount)
+
+      let clicks = Math.floor(prodCount/24)
+
+      for(let l=1; l<clicks-1; l++)
       {
-        prod = {
-          url: prodLinks[k]
-        }
-
+        await wait(1000)
+        const prodLinks = await page.$$eval(
+          '.ProductCard__StyledProductDetails-bwrMVw > div > div  a',
+          arrs => {
+            return arrs.map(op => op.href)
+          }
+        )
+  
         
-        prodStr = JSON.stringify(prod,null,2)
-        fs.appendFileSync(fileOut, prodStr)
-        fs.appendFileSync(fileOut, ',\n  ')
+        for (let k=0; k<prodLinks.length; k++)
+        {
+          prod = {
+            url: prodLinks[k]
+          }
+  
+          
+          prodStr = JSON.stringify(prod,null,2)
+          fs.appendFileSync(fileOut, prodStr)
+          fs.appendFileSync(fileOut, ',\n  ')
+  
+        }
+        
+        allLinks = allLinks.concat(prodLinks)
 
+        if (clicks>0)
+        {
+          const nextButton = await page.$('#root > main > section > section > nav > ul > li:nth-child(7) > button > svg')
+
+          nextButton.click()
+          await page.waitForNetworkIdle(
+            {
+              idleTime: 100 
+            }
+          )
+        }
+        
       }
+
       
-      allLinks = allLinks.concat(prodLinks)
 
     }
 
