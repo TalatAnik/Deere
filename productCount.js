@@ -1,6 +1,7 @@
 const puppeteer = require('puppeteer-extra')
-const fs = require('fs')
-const jsonfile = require('jsonfile')
+const pluginProxy = require('puppeteer-extra-plugin-proxy')
+const getProxies = require('get-free-https-proxy')
+
 
 // Add stealth plugin and use defaults (all tricks to hide puppeteer usage)
 const StealthPlugin = require('puppeteer-extra-plugin-stealth')
@@ -11,19 +12,11 @@ const AdblockerPlugin = require('puppeteer-extra-plugin-adblocker')
 puppeteer.use(AdblockerPlugin({ blockTrackers: true }))
 
 
+const countOutFile = "generated_links/count.txt"
+
 
 const inpDataB64 = process.argv.find((a) => a.startsWith('--input-data')).replace('--input-data', '')
 const inputData = JSON.parse(Buffer.from(inpDataB64, 'base64').toString())
-
-const proxyListFile = "proxyList.json"
-
-const fileOut = "generated_links/links.json"
-
-let proxyList = jsonfile.readFileSync(proxyListFile)
-
-function randomIntFromInterval() { // min and max included 
-    return Math.floor(Math.random() * (99))
-}
 
 //wait if needed
 async function wait(time) {
@@ -46,12 +39,18 @@ async function scrollDown(page) {
 
 async function main (url)
 {
-  let rndInt = randomIntFromInterval()
-  let ipAddress = proxyList[rndInt].url
+    // const [proxy] = await getProxies()
+ 
+    // console.log(`host: ${proxy.host} port: ${proxy.port}`)
+    
+    // puppeteer.use(pluginProxy({
+    //     address: `${proxy.host}`,
+    //     port: proxy.port
+    // }))
 
   const browser = await puppeteer.launch({
     executablePath: 'C:/Users/Anik/.cache/puppeteer/chrome/win64-1045629/chrome-win/chrome.exe',
-    headless: true,
+    headless: false,
     ignoreHTTPSErrors: true,
     args: 
     [
@@ -66,6 +65,7 @@ async function main (url)
   context = browser.defaultBrowserContext()
   const page = await browser.newPage()
 
+  await wait(500)
   await page.goto(
     url,
     { waitUntil: "networkidle2" }
@@ -78,58 +78,15 @@ async function main (url)
   let prodCount = prodCountText.split(" ")[0]
   prodCount = parseInt(prodCount)
 
+  
   console.error(prodCount)
-
-  let clicks = Math.floor(prodCount/24)
-
-  let allLinks =[]
-
-  for(let l=0; l<=clicks; l++)
-  {
-    await wait(1000)
-
-    await scrollDown(page)
-    await wait(1000)
-    
-    const prodLinks = await page.$$eval(
-      '.ProductCard__StyledProductDetails-bwrMVw > div > div  a',
-      arrs => {
-        return arrs.map(op => op.href)
-      }
-    )
-
-    
-    for (let k=0; k<prodLinks.length; k++)
-    {
-      prod = {
-        url: prodLinks[k]
-      }
-      
-      prodStr = JSON.stringify(prod,null,2)
-      fs.appendFileSync(fileOut, prodStr)
-      fs.appendFileSync(fileOut, ',\n  ')
-
-    }
-    
-    allLinks = allLinks.concat(prodLinks)
-
-    if (clicks>0 || l<clicks)
-    {
-      const nextButton = await page.$('#root > main > section > section > nav > ul > li:last-child > button')
-
-      nextButton.click()
-      await page.waitForNetworkIdle(
-        {
-          idleTime: 100 
-        }
-      )
-    }
-    
-    
-  }
   await browser.close()
 }
 
 
+try {
+    main(inputData.url)
+} catch (error) {
+   console.log(error) 
+}
 
-main(inputData.url)

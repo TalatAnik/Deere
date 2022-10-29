@@ -2,13 +2,17 @@
   "scripts": {
     "findLinks": "node linksFinder",
     "getProxy": "node getProxy",
-    "getProdLinks": "node getProdLinks"
+    "getProdLinks": "node getLinksInvoker",
+    "getProdCount": " node counterInvoker"
   },
   "dependencies": {
+    "free-proxy": "^0.2.1",
+    "get-free-https-proxy": "^2.0.2",
     "jsonfile": "^6.1.0",
     "puppeteer": "^19.1.0",
     "puppeteer-extra": "^3.3.4",
     "puppeteer-extra-plugin-adblocker": "^2.13.5",
+    "puppeteer-extra-plugin-proxy": "^1.0.2",
     "puppeteer-extra-plugin-stealth": "^2.11.1"
   }
 }

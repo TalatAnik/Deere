@@ -63,7 +63,7 @@ async function main (url) {
     )
 
     const featuredCats = await page.$$eval(
-      'body > main > div.yCmsContentSlot.row.category-container > div:nth-child(1) > div > div > div > h2 > a',
+      'body > main > div.yCmsContentSlot.row.category-container > div > div > div > div > h2 > a',
       arr => {
         return arr.map(el => el.href)
       }
