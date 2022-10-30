@@ -18,11 +18,13 @@ const inputData = JSON.parse(Buffer.from(inpDataB64, 'base64').toString())
 const proxyListFile = "proxyList.json"
 
 const fileOut = "generated_links/links.json"
+const fileCount = "generated_links/count.txt"
+const fileMissed = "generated_links/missed_links.json"
 
 let proxyList = jsonfile.readFileSync(proxyListFile)
 
 function randomIntFromInterval() { // min and max included 
-    return Math.floor(Math.random() * (99))
+  return Math.floor(Math.random() * (99))
 }
 
 //wait if needed
@@ -71,62 +73,75 @@ async function main (url)
     { waitUntil: "networkidle2" }
   )
 
-  const prodCountText = await page.$eval(
-    '#root > main > section > section > div.MuiBox-root.css-19nojhs > div.MuiBox-root.css-7eskqt > h1',
-    el => el.innerText
-  )
-  let prodCount = prodCountText.split(" ")[0]
-  prodCount = parseInt(prodCount)
-
-  console.error(prodCount)
-
-  let clicks = Math.floor(prodCount/24)
-
-  let allLinks =[]
-
-  for(let l=0; l<=clicks; l++)
-  {
-    await wait(1000)
-
-    await scrollDown(page)
-    await wait(1000)
-    
-    const prodLinks = await page.$$eval(
-      '.ProductCard__StyledProductDetails-bwrMVw > div > div  a',
-      arrs => {
-        return arrs.map(op => op.href)
-      }
+  try {
+    const prodCountText = await page.$eval(
+      '#root > main > section > section > div.MuiBox-root.css-19nojhs > div.MuiBox-root.css-7eskqt > h1',
+      el => el.innerText
     )
+    let prodCount = prodCountText.split(" ")[0]
+    // prodCount = parseInt(prodCount)
 
-    
-    for (let k=0; k<prodLinks.length; k++)
+    console.error(prodCount)
+    fs.appendFileSync(fileCount, prodCount)
+    fs.appendFileSync(fileCount, '\n')
+
+    let clicks = Math.floor(prodCount/24)
+
+  
+    for(let l=0; l<=clicks; l++)
     {
-      prod = {
-        url: prodLinks[k]
-      }
+      await wait(1000)
+  
+      await scrollDown(page)
+      await wait(1000)
       
-      prodStr = JSON.stringify(prod,null,2)
-      fs.appendFileSync(fileOut, prodStr)
-      fs.appendFileSync(fileOut, ',\n  ')
-
-    }
-    
-    allLinks = allLinks.concat(prodLinks)
-
-    if (clicks>0 || l<clicks)
-    {
-      const nextButton = await page.$('#root > main > section > section > nav > ul > li:last-child > button')
-
-      nextButton.click()
-      await page.waitForNetworkIdle(
-        {
-          idleTime: 100 
+      const prodLinks = await page.$$eval(
+        '.ProductCard__StyledProductDetails-bwrMVw > div > div  a',
+        arrs => {
+          return arrs.map(op => op.href)
         }
       )
+  
+      
+      for (let k=0; k<prodLinks.length; k++)
+      {
+        prod = {
+          url: prodLinks[k]
+        }
+        
+        prodStr = JSON.stringify(prod,null,2)
+        fs.appendFileSync(fileOut, prodStr)
+        fs.appendFileSync(fileOut, ',\n  ')
+  
+      }
+      
+      
+  
+      if (clicks>0 || l<clicks)
+      {
+        const nextButton = await page.$('#root > main > section > section > nav > ul > li:last-child > button')
+  
+        nextButton.click()
+        await page.waitForNetworkIdle(
+          {
+            idleTime: 100 
+          }
+        )
+      }
+      
+      
+    } 
+  } catch (error) {
+    missedUrl = {
+      uri: url
     }
-    
-    
+    urlStr = JSON.stringify(missedUrl, null, 2)
+    fs.appendFileSync(fileMissed, urlStr)
+    fs.appendFileSync(fileMissed, ',\n  ')
+    console.log(error)
   }
+  
+  
   await browser.close()
 }
 

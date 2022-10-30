@@ -51,11 +51,11 @@ async function main (url)
   // console.log(`host: ${proxy.ip} port: ${proxy.port}`)
   
   // await puppeteer.use(pluginProxy({
-  //   address: `${proxy.ip}`,
-  //   port: proxy.port
+  //   address: `89.163.152.206`,
+  //   port: 8080
   // }))
 
-  await wait(500)
+  
   const browser = await puppeteer.launch({
     executablePath: 'C:/Users/Anik/.cache/puppeteer/chrome/win64-1045629/chrome-win/chrome.exe',
     headless: false,
@@ -68,12 +68,15 @@ async function main (url)
 
   const page = await browser.newPage()
 
-  await wait(500)
+  
   await page.goto(
     url,
     { waitUntil: "networkidle2" }
   )
+  await wait(5000)
 
+  await page.waitForSelector('#root > main > section > section > div.MuiBox-root.css-19nojhs > div.MuiBox-root.css-7eskqt > h1')
+  
   const prodCountText = await page.$eval(
     '#root > main > section > section > div.MuiBox-root.css-19nojhs > div.MuiBox-root.css-7eskqt > h1',
     el => el.innerText
