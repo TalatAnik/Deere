@@ -15,17 +15,10 @@ puppeteer.use(AdblockerPlugin({ blockTrackers: true }))
 const inpDataB64 = process.argv.find((a) => a.startsWith('--input-data')).replace('--input-data', '')
 const inputData = JSON.parse(Buffer.from(inpDataB64, 'base64').toString())
 
-const proxyListFile = "proxyList.json"
+const fileOut = "generated_links/links2.json"
+const fileCount = "generated_links/count2.txt"
+const fileMissed = "generated_links/missed_links2.json"
 
-const fileOut = "generated_links/links.json"
-const fileCount = "generated_links/count.txt"
-const fileMissed = "generated_links/missed_links.json"
-
-let proxyList = jsonfile.readFileSync(proxyListFile)
-
-function randomIntFromInterval() { // min and max included 
-  return Math.floor(Math.random() * (99))
-}
 
 //wait if needed
 async function wait(time) {
@@ -48,8 +41,7 @@ async function scrollDown(page) {
 
 async function main (url)
 {
-  let rndInt = randomIntFromInterval()
-  let ipAddress = proxyList[rndInt].url
+
 
   const browser = await puppeteer.launch({
     executablePath: 'C:/Users/Anik/.cache/puppeteer/chrome/win64-1045629/chrome-win/chrome.exe',
@@ -90,10 +82,10 @@ async function main (url)
   
     for(let l=0; l<=clicks; l++)
     {
-      await wait(1000)
+
   
       await scrollDown(page)
-      await wait(1000)
+      await wait(500)
       
       const prodLinks = await page.$$eval(
         '.ProductCard__StyledProductDetails-bwrMVw > div > div  a',

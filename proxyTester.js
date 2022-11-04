@@ -13,9 +13,13 @@ const AdblockerPlugin = require('puppeteer-extra-plugin-adblocker')
 puppeteer.use(AdblockerPlugin({ blockTrackers: true }))
 
 
+const blockResourcesPlugin = require('puppeteer-extra-plugin-block-resources')()
+puppeteer.use(blockResourcesPlugin)
+    
+
 const featCatsFile = "generated_links/featuredLinks.json"
 
-
+const cache = {}
 
 //wait if needed
 async function wait(time) {
@@ -38,28 +42,19 @@ async function scrollDown(page) {
 
 async function main (url)
 {
-  const proxyList = new ProxyList()
-
-  let proxies
-  try {
-    proxy = await proxyList.randomByProtocol('https')
-  } catch (error) {
-    throw new Error(error)
-  }
   
   
-  // console.log(`host: ${proxy.ip} port: ${proxy.port}`)
   
-  // await puppeteer.use(pluginProxy({
-  //   address: `89.163.152.206`,
-  //   port: 8080
-  // }))
-
+   
   
   const browser = await puppeteer.launch({
     executablePath: 'C:/Users/Anik/.cache/puppeteer/chrome/win64-1045629/chrome-win/chrome.exe',
+    userDataDir: './data',
     headless: false,
     stealth: true,
+    args:[
+      "--proxy-server=127.0.0.1:24000"
+    ],
     defaultViewport: {
       width:700,
       height:768
@@ -67,13 +62,21 @@ async function main (url)
   })
 
   const page = await browser.newPage()
+  blockResourcesPlugin.blockedTypes.delete('other')
+  blockResourcesPlugin.blockedTypes.add('image')
 
-  
+
+  await page.authenticate({
+    username: 'brd-customer-hl_55cbe8a8-zone-isp',
+    password: 'zm76rukrik0k'
+  })
+
+
   await page.goto(
     url,
     { waitUntil: "networkidle2" }
   )
-  await wait(5000)
+  
 
   await page.waitForSelector('#root > main > section > section > div.MuiBox-root.css-19nojhs > div.MuiBox-root.css-7eskqt > h1')
   
@@ -89,6 +92,8 @@ async function main (url)
   await browser.close()
 }
 
+
+
 async function run() {
   
   const links = jsonfile.readFileSync(featCatsFile)
@@ -100,7 +105,7 @@ async function run() {
       await main({
         url: links[i].url
       })
-      await wait(30000)
+      
     } catch (error) {
       
 
@@ -111,4 +116,4 @@ async function run() {
   
 }
 
-main('https://shop.deere.com/jdb2cstorefront/JohnDeereStore/en/Sensors/Pressure-Sensors/c/PressureSensors/')
+main('https://shop.deere.com/jdb2cstorefront/JohnDeereStore/en/Residue-Management-Parts/Straw-Chopper-Parts/c/StrawChopperParts/')
