@@ -62,7 +62,7 @@ async function main (url)
   })
 
   const page = await browser.newPage()
-  blockResourcesPlugin.blockedTypes.delete('other')
+  blockResourcesPlugin.blockedTypes.add('other')
   blockResourcesPlugin.blockedTypes.add('image')
 
 

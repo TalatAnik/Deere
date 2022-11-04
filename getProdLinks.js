@@ -11,6 +11,9 @@ const AdblockerPlugin = require('puppeteer-extra-plugin-adblocker')
 puppeteer.use(AdblockerPlugin({ blockTrackers: true }))
 
 
+const blockResourcesPlugin = require('puppeteer-extra-plugin-block-resources')()
+puppeteer.use(blockResourcesPlugin)
+    
 
 const inpDataB64 = process.argv.find((a) => a.startsWith('--input-data')).replace('--input-data', '')
 const inputData = JSON.parse(Buffer.from(inpDataB64, 'base64').toString())
@@ -46,10 +49,10 @@ async function main (url)
   const browser = await puppeteer.launch({
     executablePath: 'C:/Users/Anik/.cache/puppeteer/chrome/win64-1045629/chrome-win/chrome.exe',
     headless: true,
-    ignoreHTTPSErrors: true,
-    args: 
-    [
-      `--window-size=1366,768`
+    userDataDir: './data',
+    stealth: true,
+    args:[
+      "--proxy-server=127.0.0.1:24000"
     ],
     defaultViewport: {
       width:700,
@@ -57,14 +60,23 @@ async function main (url)
     }    
   })
 
-  context = browser.defaultBrowserContext()
+  // context = browser.defaultBrowserContext()
   const page = await browser.newPage()
+
+  blockResourcesPlugin.blockedTypes.add('other')
+  blockResourcesPlugin.blockedTypes.add('image')
+
+  await page.authenticate({
+    username: 'brd-customer-hl_55cbe8a8-zone-isp',
+    password: 'zm76rukrik0k'
+  })
 
   await page.goto(
     url,
     { waitUntil: "networkidle2" }
   )
 
+  let missedPageNumber = 0
   try {
     const prodCountText = await page.$eval(
       '#root > main > section > section > div.MuiBox-root.css-19nojhs > div.MuiBox-root.css-7eskqt > h1',
@@ -74,18 +86,22 @@ async function main (url)
     // prodCount = parseInt(prodCount)
 
     console.error(prodCount)
-    fs.appendFileSync(fileCount, prodCount)
-    fs.appendFileSync(fileCount, '\n')
+    pCount ={
+      count: parseInt(prodCount) 
+    }
+    pCountString = JSON.stringify(pCount,null,2)
+    fs.appendFileSync(fileCount, pCountString)
+    fs.appendFileSync(fileCount, ',\n')
 
     let clicks = Math.floor(prodCount/24)
 
   
     for(let l=0; l<=clicks; l++)
     {
+      missedPageNumber = l
 
-  
       await scrollDown(page)
-      await wait(500)
+      await wait(300)
       
       const prodLinks = await page.$$eval(
         '.ProductCard__StyledProductDetails-bwrMVw > div > div  a',
@@ -125,12 +141,13 @@ async function main (url)
     } 
   } catch (error) {
     missedUrl = {
-      uri: url
+      uri: url,
+      page: missedPageNumber
     }
     urlStr = JSON.stringify(missedUrl, null, 2)
     fs.appendFileSync(fileMissed, urlStr)
     fs.appendFileSync(fileMissed, ',\n  ')
-    console.log(error)
+    console.error(error)
   }
   
   
