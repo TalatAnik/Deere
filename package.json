@@ -1,7 +1,6 @@
 {
   "scripts": {
     "findLinks": "node linksFinder",
-    "getProxy": "node getProxy",
     "getProdLinks": "node getLinksInvoker",
     "getProdCount": " node counterInvoker"
   },

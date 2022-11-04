@@ -33,9 +33,9 @@ async function wait(time) {
 
 async function scrollDown(page) {
   await page.$eval(
-    '#jumptopriv > li:nth-child(1) > a',
+    'footer',
     e => {
-      e.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'end' })
+      e.scrollIntoView({ behavior: 'smooth', inline: 'nearest' })
     }
   )
 }
@@ -93,8 +93,11 @@ async function main (url)
     fs.appendFileSync(fileCount, pCountString)
     fs.appendFileSync(fileCount, ',\n')
 
-    let clicks = Math.floor(prodCount/24)
-
+    let clicks = 0
+    if((prodCount%24) !== 0)
+      clicks = Math.floor(prodCount/24)
+    else
+      clicks = prodCount/24
   
     for(let l=0; l<=clicks; l++)
     {
@@ -125,16 +128,17 @@ async function main (url)
       
       
   
-      if (clicks>0 || l<clicks)
+      if (clicks>0 && l<clicks)
       {
-        const nextButton = await page.$('#root > main > section > section > nav > ul > li:last-child > button')
-  
-        nextButton.click()
-        await page.waitForNetworkIdle(
-          {
-            idleTime: 100 
-          }
-        )
+        const nextButton = await page.$$('ul > li:last-child >button.MuiPaginationItem-previousNext')
+        //#root > main > section > section > nav > ul > li:nth-child(4) > button
+        nextButton[nextButton.length-1].click()
+        await wait(500)
+        // await page.waitForNetworkIdle(
+        //   {
+        //     idleTime: 100 
+        //   }
+        // )
       }
       
       
