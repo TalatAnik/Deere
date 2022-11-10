@@ -14,7 +14,24 @@ puppeteer.use(AdblockerPlugin({ blockTrackers: true }))
 const blockResourcesPlugin = require('puppeteer-extra-plugin-block-resources')()
 puppeteer.use(blockResourcesPlugin)
 
-outputFile = "output/output_1.json"
+outputFile = "output/output_sample2.json"
+
+
+const inpDataB64 = process.argv.find((a) => a.startsWith('--input-data')).replace('--input-data', '')
+const inputData = JSON.parse(Buffer.from(inpDataB64, 'base64').toString())
+
+console.log(inputData)
+
+
+
+//wait if needed
+async function wait(time) {
+  return new Promise(function(resolve) {
+    setTimeout(resolve, time)
+  })
+}
+
+
 
 
 async function main (url) {
@@ -40,7 +57,7 @@ async function main (url) {
     { waitUntil: "networkidle2" }
   )
   
-  
+  await wait(1000)
 
   /***READING AND STORING <<SKU>> HERE***/
 
@@ -152,11 +169,12 @@ async function main (url) {
 
     await tabs[0].click()
     const fitsOnArray = await page.$$eval(
-      '#tabs-7--tabpanel-1 > ul > li',
+      '.css-1fz6teg',
       (array) => {
         return array.map(el => el.innerText)
       }
     )
+
     
     for(i=0;i<fitsOnArray.length;i++)
     {
@@ -165,7 +183,7 @@ async function main (url) {
       else
         fitsOn += fitsOnArray[i] + '<br>'
     }
-        
+       
     
   }  
   
@@ -192,14 +210,8 @@ async function main (url) {
   
 }
 
-//wait if needed
-async function wait(time) {
-  return new Promise(function(resolve) {
-    setTimeout(resolve, time)
-  })
-}
 
 
 
-
-main('https://shop.deere.com/jdb2cstorefront/JohnDeereStore/en/product/GY20629%3A-Idler-For-100%2C-D100%2C-G100%2C-L100%2C-La100-And-Z200-Series/p/GY20629')
+// 
+main(inputData.url)
