@@ -14,8 +14,9 @@ puppeteer.use(AdblockerPlugin({ blockTrackers: true }))
 const blockResourcesPlugin = require('puppeteer-extra-plugin-block-resources')()
 puppeteer.use(blockResourcesPlugin)
 
-outputFile = "output/output_sample2.json"
-
+const outputFileA = "output/output_mainA_02.json"
+const outputFileB = "output/output_mainB_02.json"
+const prodMissFile = 'output/missed/missedProds_main.json'
 
 const inpDataB64 = process.argv.find((a) => a.startsWith('--input-data')).replace('--input-data', '')
 const inputData = JSON.parse(Buffer.from(inpDataB64, 'base64').toString())
@@ -34,12 +35,16 @@ async function wait(time) {
 
 
 
-async function main (url) {
+async function main (urlArg, outputFile) {
   const browser = await puppeteer.launch({
-    executablePath: 'C:/Users/Anik/.cache/puppeteer/chrome/win64-1045629/chrome-win/chrome.exe',
+    // executablePath: 'C:/Users/Anik/.cache/puppeteer/chrome/win64-1045629/chrome-win/chrome.exe',
+    executablePath: 'C:/Users/talat/AppData/Local/Google/Chrome SxS/Application/chrome.exe',
     headless: true,
     userDataDir: './data',
-    args: [`--window-size=1366,768`],
+    // args: [`--window-size=1366,768`],
+    // args:[
+    //   "--proxy-server=127.0.0.1:24001"
+    // ],
     defaultViewport: {
       width:1366,
       height:768
@@ -51,9 +56,16 @@ async function main (url) {
 
   blockResourcesPlugin.blockedTypes.add('image')
   blockResourcesPlugin.blockedTypes.add('other')
+  blockResourcesPlugin.blockedTypes.add('media')
+  blockResourcesPlugin.blockedTypes.add('stylesheet')
+
+  // await page.authenticate({
+  //   username: 'brd-customer-hl_55cbe8a8-zone-zone1',
+  //   password: 'zrmm196jg4om'
+  // })
 
   await page.goto(
-    url,
+    urlArg,
     { waitUntil: "networkidle2" }
   )
   
@@ -188,7 +200,7 @@ async function main (url) {
   }  
   
   const prod = {
-    url: url,
+    url: urlArg,
     sku: sku,
     name: name,
     breadcrumbs: crumbsText,
@@ -204,8 +216,8 @@ async function main (url) {
   console.log(output)
 
   
-  fs.appendFileSync(outputFile, output)
-  fs.appendFileSync(outputFile, ', \n')
+  fs.appendFileSync(outputFile, output+', \n')
+  
   await browser.close()
   
 }
@@ -214,4 +226,40 @@ async function main (url) {
 
 
 // 
-main(inputData.url)
+
+// try {
+//   main(inputData.url)
+// } catch (error) {
+//   console.error('--index error--', error)
+//   missedLink = JSON.stringify(inputData.url,null,2)
+//   fs.appendFileSync(prodMissFile, missedLink)
+//   fs.appendFileSync(prodMissFile, ',\n  ')
+// }
+
+async function runner(url, outFile)
+{
+  try {
+    await main(url, outFile)
+  } catch (error) {
+    console.error('-- runner error --', error)
+    errData = { url: inputData.url}
+    missedLink = JSON.stringify(errData,null,2)
+    
+    fs.appendFileSync(prodMissFile, missedLink + ',\n  ')
+    
+    return
+  }
+}
+
+
+async function parallel(url1, url2) {
+  Promise.allSettled(
+    [
+      runner(url1, outputFileA),
+      runner(url2, outputFileB)
+    ]
+  )
+}
+
+
+void parallel(inputData.url1, inputData.url2)

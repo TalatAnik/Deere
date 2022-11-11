@@ -6,7 +6,7 @@ const spawn = require('child_process').spawn
 
 
 const prodLinks = 'generated_links/links.json'
-const prodMissFile = 'output/missed/missedProds_sample.json'
+
 
 
 async function runPupeteer(data) {
@@ -25,11 +25,13 @@ async function runPupeteer(data) {
     ], { shell: false })
 
     proc.stdout.on('data', (data) => {
-      stdoutData += data;
+      stdoutData += data
     })
 
     proc.stderr.on('data', (data) => {
       console.error(`NodeERR: ${data}`)
+      proc.kill()
+      resolve(stdoutData)
     })
 
     proc.on('close', async (code) => {
@@ -49,21 +51,20 @@ async function run() {
   
   const links = jsonfile.readFileSync(prodLinks)
 
-  for (var i=0; i<50; i++)
+  for (var i=190; i<1500; i+=2)
   {
-    try {
-      await runPupeteer({
-        url: links[i].url
-      })
-    } catch (error) {
-      
 
-      
-      missedLink = JSON.stringify(links[i],null,2)
-      fs.appendFileSync(prodMissFile, missedLink)
-      fs.appendFileSync(prodMissFile, ',\n  ')
-      console.log(error)
-    }
+    let date_ob = new Date()
+    let hours = date_ob.getHours()
+    let minutes = date_ob.getMinutes()
+    let seconds = date_ob.getSeconds()
+
+    console.log('🎉 ' + hours + ':'+ minutes+':'+ seconds +'================== product no: '+ i + ' and '+ (i+1) +'==================')
+    await runPupeteer({
+      url1: links[i].url,
+      url2: links[i+1].url
+    })
+    
     
   }
   

@@ -67,8 +67,8 @@ async function main (url)
   blockResourcesPlugin.blockedTypes.add('image')
 
   await page.authenticate({
-    username: 'brd-customer-hl_55cbe8a8-zone-isp',
-    password: 'zm76rukrik0k'
+    username: 'brd-customer-hl_55cbe8a8-zone-zone1',
+    password: 'zrmm196jg4om'
   })
 
   await page.goto(
