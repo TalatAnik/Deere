@@ -16,6 +16,7 @@ puppeteer.use(blockResourcesPlugin)
 
 const outputFileA = "output/output_mainA_02.json"
 const outputFileB = "output/output_mainB_02.json"
+const outputFileC = "output/output_mainC_02.json"
 const prodMissFile = 'output/missed/missedProds_main.json'
 
 const inpDataB64 = process.argv.find((a) => a.startsWith('--input-data')).replace('--input-data', '')
@@ -37,8 +38,8 @@ async function wait(time) {
 
 async function main (urlArg, outputFile) {
   const browser = await puppeteer.launch({
-    // executablePath: 'C:/Users/Anik/.cache/puppeteer/chrome/win64-1045629/chrome-win/chrome.exe',
-    executablePath: 'C:/Users/talat/AppData/Local/Google/Chrome SxS/Application/chrome.exe',
+    executablePath: 'C:/Users/Anik/.cache/puppeteer/chrome/win64-1045629/chrome-win/chrome.exe',
+    // executablePath: 'C:/Users/talat/AppData/Local/Google/Chrome SxS/Application/chrome.exe',
     headless: true,
     userDataDir: './data',
     // args: [`--window-size=1366,768`],
@@ -256,10 +257,11 @@ async function parallel(url1, url2) {
   Promise.allSettled(
     [
       runner(url1, outputFileA),
-      runner(url2, outputFileB)
+      runner(url2, outputFileB),
+      runner(url2, outputFileC)
     ]
   )
 }
 
 
-void parallel(inputData.url1, inputData.url2)
+void parallel(inputData.url1, inputData.url2, inputData.url2)
