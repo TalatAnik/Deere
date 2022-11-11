@@ -45,10 +45,10 @@ async function wait(time) {
 
 
 async function main (urlArg, outputFile) {
-  const cache = {}
-
+  
   const browser = await puppeteer.launch({
-     executablePath: 'C:/Users/Anik/.cache/puppeteer/chrome/win64-1045629/chrome-win/chrome.exe',
+    // executablePath: 'C:/Program Files/BraveSoftware/Brave-Browser/Application',
+    executablePath: 'C:/Users/Anik/.cache/puppeteer/chrome/win64-1045629/chrome-win/chrome.exe',
     // executablePath: 'C:/Users/talat/AppData/Local/Google/Chrome SxS/Application/chrome.exe',
     headless: true,
     userDataDir: './CachedData',
@@ -56,6 +56,7 @@ async function main (urlArg, outputFile) {
     // args:[
     //   "--proxy-server=127.0.0.1:24000"
     // ],
+    ignoreDefaultArgs: ['--disable-extensions'],
     defaultViewport: {
       width:1366,
       height:768
@@ -67,49 +68,8 @@ async function main (urlArg, outputFile) {
 
   
   
-
-  // The code bellow should go between newPage function and goto function
-
-  // await page.setRequestInterception(true)
-  // page.on('request', async(request) => {
-  //   const url = request.url()
-  //   if (cache[url] && cache[url].expires > Date.now()) {
-  //     await request.respond(cache[url])
-  //     return
-  //   }
-  //   else
-  //     request.continue()
-  // })
-
-
-  // page.on('response', async(response) => {
-  //   const url = response.url()
-  //   const headers = response.headers()
-  //   const cacheControl = headers['cache-control'] || ''
-  //   const maxAgeMatch = cacheControl.match(/max-age=(\d+)/)
-  //   const maxAge = maxAgeMatch && maxAgeMatch.length > 1 ? parseInt(maxAgeMatch[1], 10) : 0
-  //   if (maxAge) {
-  //     if (!cache[url] || cache[url].expires > Date.now()) return
-      
-  //     let buffer
-  //     try {
-  //       buffer = await response.buffer()
-  //     } catch (error) {
-  //       // some responses do not contain buffer and do not need to be catched
-  //       return
-  //     }
-
-  //     cache[url] = {
-  //       status: response.status(),
-  //       headers: response.headers(),
-  //       body: buffer,
-  //       expires: Date.now() + (maxAge * 1000),
-  //     }
-  //   }
-  // })
-
-
   // Block Resources
+  
   // blockResourcesPlugin.blockedTypes.add('image')
   // blockResourcesPlugin.blockedTypes.add('other')
   // blockResourcesPlugin.blockedTypes.add('media')
@@ -182,10 +142,6 @@ async function main (urlArg, outputFile) {
     else
       image_urls += images[i] + ","
   }
-
-  //https://shop.deere.com/medias/GY20629_Media_JD1200Wx1200H?context=bWFzdGVyfHJvb3R8MTE2MTQyfGltYWdlL2pwZWd8aGNiL2g2ZC84ODQ5NTA4NjMwNTU4LmpwZ3xjNmUxYmE1OWIwMTg1OWVkODM2OTQ5OGE0ODVjZTRmYzc0ZmJiYmIyMjFkODcxNjg2NTEwOWQyNzNiZTg2OTRk
-  //https://shop.deere.com/medias/GY20629_Media_JD1200Wx1200H?context=bWFzdGVyfHJvb3R8MTE2MTQyfGltYWdlL2pwZWd8aGNiL2g2ZC84ODQ5NTA4NjMwNTU4LmpwZ3xjNmUxYmE1OWIwMTg1OWVkODM2OTQ5O
-
 
   
   /***READING AND STORING <<Product Dimensions>> HERE***/
@@ -279,19 +235,6 @@ async function main (urlArg, outputFile) {
   
 }
 
-
-
-
-// 
-
-// try {
-//   main(inputData.url)
-// } catch (error) {
-//   console.error('--index error--', error)
-//   missedLink = JSON.stringify(inputData.url,null,2)
-//   fs.appendFileSync(prodMissFile, missedLink)
-//   fs.appendFileSync(prodMissFile, ',\n  ')
-// }
 
 async function runner(url, outFile)
 {
