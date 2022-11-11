@@ -10,13 +10,21 @@ puppeteer.use(StealthPlugin())
 const AdblockerPlugin = require('puppeteer-extra-plugin-adblocker')
 puppeteer.use(AdblockerPlugin({ blockTrackers: true }))
 
+const { DEFAULT_INTERCEPT_RESOLUTION_PRIORITY } = require('puppeteer')
+puppeteer.use(require('puppeteer-extra-plugin-block-resources')({
+  blockedTypes: new Set(['image', 'media','other', 'font','websocket']),
+  // Optionally enable Cooperative Mode for several request interceptors
+  interceptResolutionPriority: DEFAULT_INTERCEPT_RESOLUTION_PRIORITY
+}))
 
-const blockResourcesPlugin = require('puppeteer-extra-plugin-block-resources')()
-puppeteer.use(blockResourcesPlugin)
 
-const outputFileA = "output/output_mainA_02.json"
-const outputFileB = "output/output_mainB_02.json"
-const outputFileC = "output/output_mainC_02.json"
+// const blockResourcesPlugin = require('puppeteer-extra-plugin-block-resources')()
+// puppeteer.use(blockResourcesPlugin)
+
+const outputFileA = "output/output_mainA_01.json"
+const outputFileB = "output/output_mainB_01.json"
+const outputFileC = "output/output_mainC_01.json"
+const outputFileD = "output/output_mainD_01.json"
 const prodMissFile = 'output/missed/missedProds_main.json'
 
 const inpDataB64 = process.argv.find((a) => a.startsWith('--input-data')).replace('--input-data', '')
@@ -37,14 +45,16 @@ async function wait(time) {
 
 
 async function main (urlArg, outputFile) {
+  const cache = {}
+
   const browser = await puppeteer.launch({
-    executablePath: 'C:/Users/Anik/.cache/puppeteer/chrome/win64-1045629/chrome-win/chrome.exe',
+     executablePath: 'C:/Users/Anik/.cache/puppeteer/chrome/win64-1045629/chrome-win/chrome.exe',
     // executablePath: 'C:/Users/talat/AppData/Local/Google/Chrome SxS/Application/chrome.exe',
     headless: true,
-    userDataDir: './data',
+    userDataDir: './CachedData',
     // args: [`--window-size=1366,768`],
     // args:[
-    //   "--proxy-server=127.0.0.1:24001"
+    //   "--proxy-server=127.0.0.1:24000"
     // ],
     defaultViewport: {
       width:1366,
@@ -55,10 +65,56 @@ async function main (urlArg, outputFile) {
   
   const page = await browser.newPage()
 
-  blockResourcesPlugin.blockedTypes.add('image')
-  blockResourcesPlugin.blockedTypes.add('other')
-  blockResourcesPlugin.blockedTypes.add('media')
-  blockResourcesPlugin.blockedTypes.add('stylesheet')
+  
+  
+
+  // The code bellow should go between newPage function and goto function
+
+  // await page.setRequestInterception(true)
+  // page.on('request', async(request) => {
+  //   const url = request.url()
+  //   if (cache[url] && cache[url].expires > Date.now()) {
+  //     await request.respond(cache[url])
+  //     return
+  //   }
+  //   else
+  //     request.continue()
+  // })
+
+
+  // page.on('response', async(response) => {
+  //   const url = response.url()
+  //   const headers = response.headers()
+  //   const cacheControl = headers['cache-control'] || ''
+  //   const maxAgeMatch = cacheControl.match(/max-age=(\d+)/)
+  //   const maxAge = maxAgeMatch && maxAgeMatch.length > 1 ? parseInt(maxAgeMatch[1], 10) : 0
+  //   if (maxAge) {
+  //     if (!cache[url] || cache[url].expires > Date.now()) return
+      
+  //     let buffer
+  //     try {
+  //       buffer = await response.buffer()
+  //     } catch (error) {
+  //       // some responses do not contain buffer and do not need to be catched
+  //       return
+  //     }
+
+  //     cache[url] = {
+  //       status: response.status(),
+  //       headers: response.headers(),
+  //       body: buffer,
+  //       expires: Date.now() + (maxAge * 1000),
+  //     }
+  //   }
+  // })
+
+
+  // Block Resources
+  // blockResourcesPlugin.blockedTypes.add('image')
+  // blockResourcesPlugin.blockedTypes.add('other')
+  // blockResourcesPlugin.blockedTypes.add('media')
+  // blockResourcesPlugin.blockedTypes.add('stylesheet')
+  // blockResourcesPlugin.blockedTypes.add('font')
 
   // await page.authenticate({
   //   username: 'brd-customer-hl_55cbe8a8-zone-zone1',
@@ -243,25 +299,26 @@ async function runner(url, outFile)
     await main(url, outFile)
   } catch (error) {
     console.error('-- runner error --', error)
-    errData = { url: inputData.url}
+    errData = { url: url}
     missedLink = JSON.stringify(errData,null,2)
     
-    fs.appendFileSync(prodMissFile, missedLink + ',\n  ')
+    fs.appendFileSync(prodMissFile, missedLink + ',\n')
     
     return
   }
 }
 
 
-async function parallel(url1, url2) {
+async function parallel(url1, url2, url3, url4) {
   Promise.allSettled(
     [
       runner(url1, outputFileA),
       runner(url2, outputFileB),
-      runner(url2, outputFileC)
+      runner(url3, outputFileC),
+      runner(url4, outputFileD)
     ]
   )
 }
 
 
-void parallel(inputData.url1, inputData.url2, inputData.url2)
+void parallel(inputData.url1, inputData.url2, inputData.url3, inputData.url4)
