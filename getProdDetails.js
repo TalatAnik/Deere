@@ -21,10 +21,10 @@ puppeteer.use(require('puppeteer-extra-plugin-block-resources')({
 // const blockResourcesPlugin = require('puppeteer-extra-plugin-block-resources')()
 // puppeteer.use(blockResourcesPlugin)
 
-const outputFileA = "output/output_mainA_01.json"
-const outputFileB = "output/output_mainB_01.json"
-const outputFileC = "output/output_mainC_01.json"
-const outputFileD = "output/output_mainD_01.json"
+const outputFileA = "output/output_mainA_02.json"
+const outputFileB = "output/output_mainB_02.json"
+const outputFileC = "output/output_mainC_02.json"
+const outputFileD = "output/output_mainD_02.json"
 const prodMissFile = 'output/missed/missedProds_main.json'
 
 const inpDataB64 = process.argv.find((a) => a.startsWith('--input-data')).replace('--input-data', '')
@@ -44,18 +44,18 @@ async function wait(time) {
 
 
 
-async function main (urlArg, outputFile) {
+async function main (urlArg, myCache, outputFile) {
   
   const browser = await puppeteer.launch({
     // executablePath: 'C:/Program Files/BraveSoftware/Brave-Browser/Application',
     executablePath: 'C:/Users/Anik/.cache/puppeteer/chrome/win64-1045629/chrome-win/chrome.exe',
     // executablePath: 'C:/Users/talat/AppData/Local/Google/Chrome SxS/Application/chrome.exe',
     headless: true,
-    userDataDir: './CachedData',
+    userDataDir: myCache,
     // args: [`--window-size=1366,768`],
-    // args:[
-    //   "--proxy-server=127.0.0.1:24000"
-    // ],
+    args:[
+      "--proxy-server=127.0.0.1:24000"
+    ],
     ignoreDefaultArgs: ['--disable-extensions'],
     defaultViewport: {
       width:1366,
@@ -76,10 +76,10 @@ async function main (urlArg, outputFile) {
   // blockResourcesPlugin.blockedTypes.add('stylesheet')
   // blockResourcesPlugin.blockedTypes.add('font')
 
-  // await page.authenticate({
-  //   username: 'brd-customer-hl_55cbe8a8-zone-zone1',
-  //   password: 'zrmm196jg4om'
-  // })
+  await page.authenticate({
+    username: 'brd-customer-hl_55cbe8a8-zone-zone1',
+    password: 'zrmm196jg4om'
+  })
 
   await page.goto(
     urlArg,
@@ -236,10 +236,10 @@ async function main (urlArg, outputFile) {
 }
 
 
-async function runner(url, outFile)
+async function runner(url, bCache, outFile)
 {
   try {
-    await main(url, outFile)
+    await main(url, bCache, outFile)
   } catch (error) {
     console.error('-- runner error --', error)
     errData = { url: url}
@@ -252,16 +252,16 @@ async function runner(url, outFile)
 }
 
 
-async function parallel(url1, url2, url3, url4) {
+async function parallel(data1, data2, data3, data4) {
   Promise.allSettled(
     [
-      runner(url1, outputFileA),
-      runner(url2, outputFileB),
-      runner(url3, outputFileC),
-      runner(url4, outputFileD)
+      runner(data1.url, data1.cache, outputFileA),
+      runner(data2.url, data2.cache, outputFileB),
+      runner(data3.url, data3.cache, outputFileC),
+      runner(data4.url, data4.cache, outputFileD)
     ]
   )
 }
 
 
-void parallel(inputData.url1, inputData.url2, inputData.url3, inputData.url4)
+void parallel(inputData[0], inputData[1], inputData[2], inputData[3])

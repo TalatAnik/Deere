@@ -56,7 +56,7 @@ async function run() {
   
   const links = jsonfile.readFileSync(prodLinks)
 
-  for (var i=688; i<1600; i+=4)
+  for (var i=1600; i<1700; i+=4)
   {
     if(i%96==0)
     {
@@ -70,12 +70,28 @@ async function run() {
     let seconds = date_ob.getSeconds()
 
     console.log('🎉 ' + hours + ':'+ minutes+':'+ seconds +'================== product no: '+ i + ' and '+ (i+1) + ' and '+ (i+2) + ' and '+ (i+3) +'==================')
-    await runPupeteer({
-      url1: links[i].url,
-      url2: links[i+1].url,
-      url3: links[i+2].url,
-      url4: links[i+3].url
-    })
+    
+    arg1 = {
+      url: links[i].url,
+      cache: "./browserCache1"
+    }
+
+    arg2 = {
+      url: links[i+1].url,
+      cache: "./browserCache2"
+    }
+
+    arg3 = {
+      url: links[i+2].url,
+      cache: "./browserCache3"
+    }
+
+    arg4 = {
+      url: links[i+3].url,
+      cache: "./browserCache4"
+    }
+
+    await runPupeteer([arg1, arg2, arg3, arg4])
   }
   
 }
