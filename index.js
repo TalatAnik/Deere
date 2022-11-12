@@ -56,12 +56,12 @@ async function run() {
   
   const links = jsonfile.readFileSync(prodLinks)
 
-  for (var i=352; i<1500; i+=4)
+  for (var i=688; i<1600; i+=4)
   {
-    if(i%200==0)
+    if(i%96==0)
     {
       console.log("************* time to wait 2 minutes ************")
-      await wait(1*60*1000)
+      await wait(1.5*60*1000)
     }
       
     let date_ob = new Date()
