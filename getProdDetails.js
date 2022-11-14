@@ -18,8 +18,6 @@ puppeteer.use(require('puppeteer-extra-plugin-block-resources')({
 }))
 
 
-// const blockResourcesPlugin = require('puppeteer-extra-plugin-block-resources')()
-// puppeteer.use(blockResourcesPlugin)
 
 const outputFileA = "output/output_mainA_02.json"
 const outputFileB = "output/output_mainB_02.json"
@@ -52,10 +50,11 @@ async function main (urlArg, myCache, outputFile) {
     // executablePath: 'C:/Users/talat/AppData/Local/Google/Chrome SxS/Application/chrome.exe',
     headless: true,
     userDataDir: myCache,
+    stealth: true,
     // args: [`--window-size=1366,768`],
-    args:[
-      "--proxy-server=127.0.0.1:24000"
-    ],
+    // args:[
+    //   "--proxy-server=127.0.0.1:24000"
+    // ],
     ignoreDefaultArgs: ['--disable-extensions'],
     defaultViewport: {
       width:1366,
@@ -76,23 +75,23 @@ async function main (urlArg, myCache, outputFile) {
   // blockResourcesPlugin.blockedTypes.add('stylesheet')
   // blockResourcesPlugin.blockedTypes.add('font')
 
-  await page.authenticate({
-    username: 'brd-customer-hl_55cbe8a8-zone-zone1',
-    password: 'zrmm196jg4om'
-  })
+  // await page.authenticate({
+  //   username: 'brd-customer-hl_55cbe8a8-zone-zone1',
+  //   password: 'zrmm196jg4om'
+  // })
 
   await page.goto(
     urlArg,
     { waitUntil: "networkidle2" }
   )
   
-  await wait(1000)
+  await wait(1500)
 
   /***READING AND STORING <<SKU>> HERE***/
 
   const sku = await page.$eval(
-    'div.css-12ybf7 > p',
-    el => el.innerText.split(': ')[1]
+    'h1.css-cxde3c',
+    el => el.innerText.split(': ')[0]
   )
   
   

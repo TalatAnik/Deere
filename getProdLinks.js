@@ -11,16 +11,22 @@ const AdblockerPlugin = require('puppeteer-extra-plugin-adblocker')
 puppeteer.use(AdblockerPlugin({ blockTrackers: true }))
 
 
-const blockResourcesPlugin = require('puppeteer-extra-plugin-block-resources')()
-puppeteer.use(blockResourcesPlugin)
-    
+const { DEFAULT_INTERCEPT_RESOLUTION_PRIORITY } = require('puppeteer')
+puppeteer.use(require('puppeteer-extra-plugin-block-resources')({
+  blockedTypes: new Set(['image', 'media','other', 'font','websocket']),
+  // Optionally enable Cooperative Mode for several request interceptors
+  interceptResolutionPriority: DEFAULT_INTERCEPT_RESOLUTION_PRIORITY
+}))
 
 const inpDataB64 = process.argv.find((a) => a.startsWith('--input-data')).replace('--input-data', '')
 const inputData = JSON.parse(Buffer.from(inpDataB64, 'base64').toString())
 
-const fileOut = "generated_links/links2.json"
-const fileCount = "generated_links/count2.txt"
-const fileMissed = "generated_links/missed_links2.json"
+const outputFileA = "generated_links_FINAL/links_01.json"
+const outputFileB = "generated_links_FINAL/links_02.json"
+const outputFileC = "generated_links_FINAL/links_03.json"
+const outputFileD = "generated_links_FINAL/links_04.json"
+const fileCount = "generated_links_FINAL/count.txt"
+const fileMissed = "generated_links_FINAL/missed_links.json"
 
 
 //wait if needed
@@ -35,21 +41,21 @@ async function scrollDown(page) {
   await page.$eval(
     'footer',
     e => {
-      e.scrollIntoView({ behavior: 'smooth', inline: 'nearest' })
+      e.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' })
     }
   )
 }
 
 
 
-async function main (url)
+async function main (urlArg, myCache, outputFile)
 {
 
 
   const browser = await puppeteer.launch({
     executablePath: 'C:/Users/Anik/.cache/puppeteer/chrome/win64-1045629/chrome-win/chrome.exe',
-    headless: true,
-    userDataDir: './data',
+    headless: false,
+    userDataDir: myCache,
     stealth: true,
     args:[
       "--proxy-server=127.0.0.1:24000"
@@ -63,29 +69,30 @@ async function main (url)
   // context = browser.defaultBrowserContext()
   const page = await browser.newPage()
 
-  blockResourcesPlugin.blockedTypes.add('other')
-  blockResourcesPlugin.blockedTypes.add('image')
-
   await page.authenticate({
     username: 'brd-customer-hl_55cbe8a8-zone-zone1',
     password: 'zrmm196jg4om'
   })
 
   await page.goto(
-    url,
+    urlArg,
     { waitUntil: "networkidle2" }
   )
+
+
+  await wait(1500)
+
 
   let missedPageNumber = 0
   try {
     const prodCountText = await page.$eval(
-      '#root > main > section > section > div.MuiBox-root.css-19nojhs > div.MuiBox-root.css-7eskqt > h1',
+      '#root > main > section > section h1',
       el => el.innerText
     )
     let prodCount = prodCountText.split(" ")[0]
     // prodCount = parseInt(prodCount)
 
-    console.error(prodCount)
+    // console.error(prodCount)
     pCount ={
       count: parseInt(prodCount) 
     }
@@ -113,6 +120,7 @@ async function main (url)
         }
       )
   
+      let strToWrite = ""
       
       for (let k=0; k<prodLinks.length; k++)
       {
@@ -121,12 +129,12 @@ async function main (url)
         }
         
         prodStr = JSON.stringify(prod,null,2)
-        fs.appendFileSync(fileOut, prodStr)
-        fs.appendFileSync(fileOut, ',\n  ')
-  
+        prodStr += ',\n'
+        
+        strToWrite += prodStr
       }
       
-      
+      fs.appendFileSync(outputFile, strToWrite)
   
       if (clicks>0 && l<clicks)
       {
@@ -145,7 +153,7 @@ async function main (url)
     } 
   } catch (error) {
     missedUrl = {
-      uri: url,
+      uri: urlArg,
       page: missedPageNumber
     }
     urlStr = JSON.stringify(missedUrl, null, 2)
@@ -158,6 +166,22 @@ async function main (url)
   await browser.close()
 }
 
+async function runner(url, bCache, outFile)
+{
+  main(url, bCache, outFile)
+}
 
+async function parallel(data1, data2, data3, data4) {
+  Promise.allSettled(
+    [
+      runner(data1.url, data1.cache, outputFileA),
+      runner(data2.url, data2.cache, outputFileB),
+      runner(data3.url, data3.cache, outputFileC),
+      runner(data4.url, data4.cache, outputFileD)
+    ]
+  )
+}
 
-main(inputData.url)
+// main(inputData.url)
+
+void parallel(inputData[0], inputData[1], inputData[2], inputData[3])

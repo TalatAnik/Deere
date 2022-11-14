@@ -23,11 +23,14 @@ async function runPupeteer(data) {
     ], { shell: false })
 
     proc.stdout.on('data', (data) => {
-      stdoutData += data;
+      stdoutData += data
+      console.log("message: ", Buffer.from(data).toString('base64'))
     })
 
     proc.stderr.on('data', (data) => {
       console.error(`NodeERR: ${data}`)
+      proc.kill()
+      resolve(stdoutData)
     })
 
     proc.on('close', async (code) => {
@@ -47,21 +50,38 @@ async function run() {
   
   const links = jsonfile.readFileSync(featCatsFile)
 
-  for (var i=0; i<links.length; i++)
+  for (var i=0; i<4; i+=4)
   {
-    try {
-      await runPupeteer({
-        url: links[i].url
-      })
-    } catch (error) {
-      
 
-      
-      missedLink = JSON.stringify(links[i],null,2)
-      fs.appendFileSync(missFile, missedLink)
-      fs.appendFileSync(missFile, ',\n  ')
-      console.log(error)
+    let date_ob = new Date()
+    let hours = date_ob.getHours()
+    let minutes = date_ob.getMinutes()
+    let seconds = date_ob.getSeconds()
+
+    console.log('🎉 ' + hours + ':'+ minutes+':'+ seconds +'====== featured category no: '+ i + ' and '+ (i+1) + ' and '+ (i+2) + ' and '+ (i+3) +'===========')
+    
+    arg1 = {
+      url: links[i].url,
+      cache: "./browserCache1"
     }
+
+    arg2 = {
+      url: links[i+1].url,
+      cache: "./browserCache2"
+    }
+
+    arg3 = {
+      url: links[i+2].url,
+      cache: "./browserCache3"
+    }
+
+    arg4 = {
+      url: links[i+3].url,
+      cache: "./browserCache4"
+    }
+
+    await runPupeteer([arg1, arg2, arg3, arg4])
+    
     
   }
   

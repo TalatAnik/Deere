@@ -5,7 +5,10 @@ const spawn = require('child_process').spawn
 
 
 
-const prodLinks = 'generated_links/links.json'
+// const prodLinks = 'generated_links/links.json'
+
+const prodLinks = 'output/missed/missedProds_main.json'
+
 
 //wait if needed
 async function wait(time) {
@@ -56,12 +59,12 @@ async function run() {
   
   const links = jsonfile.readFileSync(prodLinks)
 
-  for (var i=1600; i<1700; i+=4)
+  for (var i=0; i<links.length; i+=4)
   {
     if(i%96==0)
     {
       console.log("************* time to wait 2 minutes ************")
-      await wait(1.5*60*1000)
+      await wait(0*60*1000)
     }
       
     let date_ob = new Date()
