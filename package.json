@@ -9,6 +9,7 @@
     "axios-https-proxy-fix": "^0.17.1",
     "free-proxy": "^0.2.1",
     "get-free-https-proxy": "^2.0.2",
+    "json-as-xlsx": "^2.4.6",
     "jsonfile": "^6.1.0",
     "puppeteer": "^19.1.0",
     "puppeteer-extra": "^3.3.4",

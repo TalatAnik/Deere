@@ -5,7 +5,7 @@ const spawn = require('child_process').spawn
 
 
 
-const prodLinks = 'generated_links_FINAL/links_01.json'
+const prodLinks = 'generated_links_FINAL/missed_rescraped_links.json'
 
 // const prodLinks = 'output/missed/missedProds_main.json'
 

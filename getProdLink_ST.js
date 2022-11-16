@@ -21,12 +21,14 @@ puppeteer.use(require('puppeteer-extra-plugin-block-resources')({
 const inpDataB64 = process.argv.find((a) => a.startsWith('--input-data')).replace('--input-data', '')
 const inputData = JSON.parse(Buffer.from(inpDataB64, 'base64').toString())
 
-const outputFileA = "generated_links_FINAL/links_01.json"
-const outputFileB = "generated_links_FINAL/links_02.json"
-const outputFileC = "generated_links_FINAL/links_03.json"
-const outputFileD = "generated_links_FINAL/links_04.json"
-const fileCount = "generated_links_FINAL/count.txt"
-const fileMissed = "generated_links_FINAL/missed_links.json"
+const outputFileA = "generated_links_FINAL/links_MISSED_RESCRAPED.json"
+// const outputFileA = "generated_links_FINAL/links_01.json"
+// const outputFileB = "generated_links_FINAL/links_02.json"
+// const outputFileC = "generated_links_FINAL/links_03.json"
+// const outputFileD = "generated_links_FINAL/links_04.json"
+// const fileCount = "generated_links_FINAL/count.txt"
+const fileCount = "generated_links_FINAL/count_new.txt"
+const fileMissed = "generated_links_FINAL/missed_links_FINAL.json"
 
 
 //wait if needed

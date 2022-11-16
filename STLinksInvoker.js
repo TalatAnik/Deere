@@ -4,9 +4,10 @@ const path = require('path')
 const spawn = require('child_process').spawn
 
 
+const featCatsFile = 'generated_links_FINAL/missed_links.json'
 
-const featCatsFile = 'generated_links/featuredLinks.json'
-const missFile = 'generated_links/missedLinks.json'
+// const featCatsFile = 'generated_links/featuredLinks.json'
+// const missFile = 'generated_links/missedLinks.json'
 
 
 async function runPupeteer(data) {
@@ -62,7 +63,8 @@ async function run() {
     
     arg1 = {
       url: links[i].url,
-      cache: "./browserCache1"
+      cache: "./browserCache1",
+      
     }
 
     

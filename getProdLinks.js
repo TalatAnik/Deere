@@ -18,15 +18,15 @@ puppeteer.use(require('puppeteer-extra-plugin-block-resources')({
   interceptResolutionPriority: DEFAULT_INTERCEPT_RESOLUTION_PRIORITY
 }))
 
-const inpDataB64 = process.argv.find((a) => a.startsWith('--input-data')).replace('--input-data', '')
-const inputData = JSON.parse(Buffer.from(inpDataB64, 'base64').toString())
+// const inpDataB64 = process.argv.find((a) => a.startsWith('--input-data')).replace('--input-data', '')
+// const inputData = JSON.parse(Buffer.from(inpDataB64, 'base64').toString())
 
-const outputFileA = "generated_links_FINAL/links_01.json"
-const outputFileB = "generated_links_FINAL/links_02.json"
-const outputFileC = "generated_links_FINAL/links_03.json"
-const outputFileD = "generated_links_FINAL/links_04.json"
-const fileCount = "generated_links_FINAL/count.txt"
-const fileMissed = "generated_links_FINAL/missed_links.json"
+const outputFileA = "generated_links_FINAL/missed_rescraped_links.json"
+// const outputFileB = "generated_links_FINAL/missed_links_02.json"
+// const outputFileC = "generated_links_FINAL/missed_links_03.json"
+// const outputFileD = "generated_links_FINAL/missed_links_04.json"
+// const fileCount = "generated_links_FINAL/missed_count.txt"
+const fileMissed = "generated_links_FINAL/missed_missed__links.json"
 
 
 //wait if needed
@@ -97,8 +97,8 @@ async function main (urlArg, myCache, outputFile)
       count: parseInt(prodCount) 
     }
     pCountString = JSON.stringify(pCount,null,2)
-    fs.appendFileSync(fileCount, pCountString)
-    fs.appendFileSync(fileCount, ',\n')
+    // fs.appendFileSync(fileCount, pCountString)
+    // fs.appendFileSync(fileCount, ',\n')
 
     let clicks = 0
     if((prodCount%24) !== 0)
@@ -111,7 +111,7 @@ async function main (urlArg, myCache, outputFile)
       missedPageNumber = l
 
       await scrollDown(page)
-      await wait(300)
+      await wait(1500)
       
       const prodLinks = await page.$$eval(
         '.ProductCard__StyledProductDetails-bwrMVw > div > div  a',
@@ -141,7 +141,7 @@ async function main (urlArg, myCache, outputFile)
         const nextButton = await page.$$('ul > li:last-child >button.MuiPaginationItem-previousNext')
         //#root > main > section > section > nav > ul > li:nth-child(4) > button
         nextButton[nextButton.length-1].click()
-        await wait(500)
+        await wait(1000)
         // await page.waitForNetworkIdle(
         //   {
         //     idleTime: 100 
@@ -182,6 +182,7 @@ async function parallel(data1, data2, data3, data4) {
   )
 }
 
-// main(inputData.url)
+myUrl = "https://shop.deere.com/jdb2cstorefront/JohnDeereStore/en/Sheet-Metal-Parts/Canopies/c/Canopies/"
+ main(myUrl, "./browserCache1", outputFileA)
 
-void parallel(inputData[0], inputData[1], inputData[2], inputData[3])
+// void parallel(inputData[0], inputData[1], inputData[2], inputData[3])

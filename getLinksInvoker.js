@@ -4,9 +4,9 @@ const path = require('path')
 const spawn = require('child_process').spawn
 
 
-
-const featCatsFile = 'generated_links/featuredLinks.json'
-const missFile = 'generated_links/missedLinks.json'
+const featCatsFile = 'generated_links_FINAL/missed_links.json'
+// const featCatsFile = 'generated_links/featuredLinks.json'
+// const missFile = 'generated_links/missedLinks.json'
 
 
 async function runPupeteer(data) {

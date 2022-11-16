@@ -23,7 +23,7 @@ const outputFileA = "output_FINAL/output_mainA_01.json"
 const outputFileB = "output_FINAL/output_mainB_01.json"
 const outputFileC = "output_FINAL/output_mainC_01.json"
 const outputFileD = "output_FINAL/output_mainD_01.json"
-const prodMissFile = 'output_FINAL/missed/missedProds_main.json'
+const prodMissFile = 'output_FINAL/missed/rescraped_missed_Final.json'
 
 const inpDataB64 = process.argv.find((a) => a.startsWith('--input-data')).replace('--input-data', '')
 const inputData = JSON.parse(Buffer.from(inpDataB64, 'base64').toString())
