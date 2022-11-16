@@ -60,8 +60,9 @@ async function run() {
   const links = jsonfile.readFileSync(prodLinks)
 
   // for (var i=0; i<links.length; i+=4)
-  for(let i=6000; i<7500; i+=4)
+  for(let i=13500; i<links.length; i+=4)
   {
+
     // if(i%96==0)
     // {
     //   console.log("************* time to wait 2 minutes ************")
