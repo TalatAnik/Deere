@@ -19,11 +19,11 @@ puppeteer.use(require('puppeteer-extra-plugin-block-resources')({
 
 
 
-const outputFileA = "output/output_mainA_02.json"
-const outputFileB = "output/output_mainB_02.json"
-const outputFileC = "output/output_mainC_02.json"
-const outputFileD = "output/output_mainD_02.json"
-const prodMissFile = 'output/missed/missedProds_main.json'
+const outputFileA = "output_FINAL/output_mainA_01.json"
+const outputFileB = "output_FINAL/output_mainB_01.json"
+const outputFileC = "output_FINAL/output_mainC_01.json"
+const outputFileD = "output_FINAL/output_mainD_01.json"
+const prodMissFile = 'output_FINAL/missed/missedProds_main.json'
 
 const inpDataB64 = process.argv.find((a) => a.startsWith('--input-data')).replace('--input-data', '')
 const inputData = JSON.parse(Buffer.from(inpDataB64, 'base64').toString())
@@ -52,9 +52,9 @@ async function main (urlArg, myCache, outputFile) {
     userDataDir: myCache,
     stealth: true,
     // args: [`--window-size=1366,768`],
-    // args:[
-    //   "--proxy-server=127.0.0.1:24000"
-    // ],
+    args:[
+      "--proxy-server=127.0.0.1:24000"
+    ],
     ignoreDefaultArgs: ['--disable-extensions'],
     defaultViewport: {
       width:1366,
@@ -75,10 +75,10 @@ async function main (urlArg, myCache, outputFile) {
   // blockResourcesPlugin.blockedTypes.add('stylesheet')
   // blockResourcesPlugin.blockedTypes.add('font')
 
-  // await page.authenticate({
-  //   username: 'brd-customer-hl_55cbe8a8-zone-zone1',
-  //   password: 'zrmm196jg4om'
-  // })
+  await page.authenticate({
+    username: 'brd-customer-hl_55cbe8a8-zone-zone1',
+    password: 'zrmm196jg4om'
+  })
 
   await page.goto(
     urlArg,
