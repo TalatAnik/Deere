@@ -1,0 +1,7 @@
+[1117/011035.151:INFO:CONSOLE(86)] "%cERROR: : Root Log Group level Trace color: red;", source: https://shop.deere.com/jdb2cstorefront/_ui/responsive/common/js/tracker.js (86)
+[1117/011036.035:INFO:CONSOLE(8)] "storageSpanner.deere initialized and ready on shop.deere.com [object Object]", source: https://assets.adobedtm.com/c271735be4ea/0dbfba1dfa0d/launch-ebdc6dd04d4d.min.js (8)
+[1117/011037.736:INFO:CONSOLE(974)] "Session API Error", source: https://shop.deere.com/jdb2cstorefront/JohnDeereStore/en/product/RE561288%3A-Heavy-Duty-Draft-Link-W-And-Ball-End-%2C14%2C000-Lb-Hitch%2C/p/RE561288 (974)
+[1117/011038.485:INFO:CONSOLE(9)] "Adobe Data Layer Push Event", source: https://assets.adobedtm.com/c271735be4ea/0dbfba1dfa0d/launch-ebdc6dd04d4d.min.js (9)
+[1117/011038.486:INFO:CONSOLE(9)] "console.groupEnd", source: https://assets.adobedtm.com/c271735be4ea/0dbfba1dfa0d/launch-ebdc6dd04d4d.min.js (9)
+[1117/011038.527:INFO:CONSOLE(3)] "Adobe Edge Collect Server Call", source: https://assets.adobedtm.com/c271735be4ea/0dbfba1dfa0d/launch-ebdc6dd04d4d.min.js (3)
+[1117/011038.528:INFO:CONSOLE(3)] "console.groupEnd", source: https://assets.adobedtm.com/c271735be4ea/0dbfba1dfa0d/launch-ebdc6dd04d4d.min.js (3)

@@ -1,5 +1,4 @@
 const jsonfile = require('jsonfile')
-const fs = require('fs')
 const path = require('path')
 const spawn = require('child_process').spawn
 
@@ -60,7 +59,7 @@ async function run() {
   const links = jsonfile.readFileSync(prodLinks)
 
   // for (var i=0; i<links.length; i+=4)
-  for(let i=13500; i<links.length; i+=4)
+  for(let i=0; i<links.length; i+=4)
   {
 
     // if(i%96==0)
